@@ -1,0 +1,31 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:io:gravitee:discovery:consul:configuration:ConsulServiceDiscoveryConfiguration",
+  "properties" : {
+    "url" : {
+      "title": "Consul.io URL",
+      "description": "Address of the Consul.io agent",
+      "type" : "string",
+      "default": "http://localhost:8500"
+    },
+    "service" : {
+      "title": "Service",
+      "description": "The service name to query",
+      "type" : "string"
+    },
+    "dc" : {
+      "title": "DC",
+      "description": "Name of the data-center to query. If unspecified, the query will default to the data-center of the Consul agent at the HTTP address.",
+      "type" : "string"
+    },
+    "acl" : {
+      "title": "ACL",
+      "description": "ACL token to use in the request. This can also be specified via the CONSUL_HTTP_TOKEN environment variable. If unspecified, the query will default to the token of the Consul agent at the HTTP address.",
+      "type" : "string"
+    }
+  },
+  "required": [
+    "url",
+    "service"
+  ]
+}
