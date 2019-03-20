@@ -17,8 +17,8 @@ package io.gravitee.discovery.consul;
 
 import io.gravitee.discovery.api.ServiceDiscovery;
 import io.gravitee.discovery.api.event.Event;
-import io.gravitee.discovery.api.event.EventType;
 import io.gravitee.discovery.api.event.Handler;
+import io.gravitee.discovery.api.service.AbstractServiceDiscovery;
 import io.gravitee.discovery.consul.configuration.ConsulServiceDiscoveryConfiguration;
 import io.gravitee.discovery.consul.service.ConsulService;
 import io.vertx.core.Vertx;
@@ -28,14 +28,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
  * @author GraviteeSource Team
  */
-public class ConsulServiceDiscovery implements ServiceDiscovery {
+public class ConsulServiceDiscovery extends AbstractServiceDiscovery<ConsulService> implements ServiceDiscovery {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ConsulServiceDiscovery.class);
 
@@ -48,8 +47,6 @@ public class ConsulServiceDiscovery implements ServiceDiscovery {
     private final ConsulServiceDiscoveryConfiguration configuration;
 
     private Watch<ServiceEntryList> watcher;
-
-    private List<ConsulService> services = new ArrayList<>();
 
     public ConsulServiceDiscovery(final ConsulServiceDiscoveryConfiguration configuration) {
         this.configuration = configuration;
@@ -94,57 +91,21 @@ public class ConsulServiceDiscovery implements ServiceDiscovery {
                     ConsulService consulService = new ConsulService(service1);
 
                     // Get previous service reference
-                    ConsulService oldService = services.stream().filter(consulService::equals).findAny().orElse(null);
+                    ConsulService oldService = getService(consulService::equals);
 
                     // Endpoint does not exist (according to its name)
                     if (oldService == null) {
                         LOGGER.info("Register a new service from Consul.io: id[{}] name[{}]",
                                 service1.getId(), service1.getName());
-
-                        services.add(consulService);
-
-                        handler.handle(new Event() {
-                            @Override
-                            public EventType type() {
-                                return EventType.REGISTER;
-                            }
-
-                            @Override
-                            public io.gravitee.discovery.api.service.Service service() {
-                                return consulService;
-                            }
-                        });
-
+                        handler.handle(registerEndpoint(consulService));
                     } else {
                         // Update it only if target has been changed
                         if (consulService.port() != oldService.port() ||
                                 ! consulService.host().equals(oldService.host())) {
                             LOGGER.info("Update an existing service from Consul.io: id[{}] name[{}] address[{}:{}]",
                                     service1.getId(), service1.getName(), consulService.host(), consulService.port());
-
-                            handler.handle(new Event() {
-                                @Override
-                                public EventType type() {
-                                    return EventType.UNREGISTER;
-                                }
-
-                                @Override
-                                public io.gravitee.discovery.api.service.Service service() {
-                                    return oldService;
-                                }
-                            });
-
-                            handler.handle(new Event() {
-                                @Override
-                                public EventType type() {
-                                    return EventType.REGISTER;
-                                }
-
-                                @Override
-                                public io.gravitee.discovery.api.service.Service service() {
-                                    return consulService;
-                                }
-                            });
+                            handler.handle(unregisterEndpoint(oldService));
+                            handler.handle(registerEndpoint(consulService));
                         }
                     }
                 }
@@ -158,18 +119,8 @@ public class ConsulServiceDiscovery implements ServiceDiscovery {
                         for (ServiceEntry oldEntry : oldEntries) {
                             LOGGER.info("Remove a de-registered service from Consul.io: id[{}] name[{}]",
                                     oldEntry.getService().getId(), oldEntry.getService().getName());
-
-                            handler.handle(new Event() {
-                                @Override
-                                public EventType type() {
-                                    return EventType.UNREGISTER;
-                                }
-
-                                @Override
-                                public io.gravitee.discovery.api.service.Service service() {
-                                    return new ConsulService(oldEntry.getService());
-                                }
-                            });
+                            final ConsulService consulService = new ConsulService(oldEntry.getService());
+                            handler.handle(unregisterEndpoint(consulService));
                         }
                     }
                 }
