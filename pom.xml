@@ -24,7 +24,7 @@
     <parent>
         <groupId>io.gravitee</groupId>
         <artifactId>gravitee-parent</artifactId>
-        <version>15</version>
+        <version>16</version>
     </parent>
 
     <groupId>io.gravitee.discovery</groupId>
@@ -35,7 +35,7 @@
 
     <properties>
         <gravitee-common.version>1.14.0</gravitee-common.version>
-        <gravitee-service-discovery-api.version>1.1.0</gravitee-service-discovery-api.version>
+        <gravitee-service-discovery-api.version>1.2.0-SNAPSHOT</gravitee-service-discovery-api.version>
     </properties>
 
     <dependencies>

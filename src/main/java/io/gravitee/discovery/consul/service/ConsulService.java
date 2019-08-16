@@ -25,10 +25,9 @@ import java.util.Objects;
  */
 public class ConsulService implements Service {
 
-    private final static String CONSUL_ID_PREFIX = "consul:";
     private final io.vertx.ext.consul.Service service;
     private final String address;
-    private final String id;
+    private final String instanceId;
 
     public ConsulService(final io.vertx.ext.consul.Service service) {
         this.service = service;
@@ -39,12 +38,17 @@ public class ConsulService implements Service {
             this.address = service.getAddress();
         }
 
-        this.id = CONSUL_ID_PREFIX + service.getId();
+        this.instanceId = service.getId();
     }
 
     @Override
-    public String id() {
-        return id;
+    public String vendor() {
+        return "consul";
+    }
+
+    @Override
+    public String instanceId() {
+        return instanceId;
     }
 
     @Override
@@ -62,11 +66,11 @@ public class ConsulService implements Service {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ConsulService that = (ConsulService) o;
-        return id.equals(that.id);
+        return id().equals(that.id());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(id());
     }
 }
