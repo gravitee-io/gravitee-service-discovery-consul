@@ -26,9 +26,15 @@ import java.util.Objects;
 public class ConsulService implements Service {
 
     private final static String CONSUL_ID_PREFIX = "consul:";
+
+    private final static String CONSUL_SSL_METADATA = "gravitee_ssl";
+    private final static String CONSUL_PATH_METADATA = "gravitee_path";
+
     private final io.vertx.ext.consul.Service service;
     private final String address;
     private final String id;
+    private String scheme = HTTP_SCHEME;
+    private String path = DEFAULT_BASE_PATH;
 
     public ConsulService(final io.vertx.ext.consul.Service service) {
         this.service = service;
@@ -40,6 +46,16 @@ public class ConsulService implements Service {
         }
 
         this.id = CONSUL_ID_PREFIX + service.getId();
+
+        String sslMetadata = (service.getMeta() != null) ? service.getMeta().get(CONSUL_SSL_METADATA) : null;
+        if (Boolean.parseBoolean(sslMetadata)) {
+            scheme = HTTPS_SCHEME;
+        }
+
+        String pathMetadata = (service.getMeta() != null) ? service.getMeta().get(CONSUL_PATH_METADATA) : null;
+        if (pathMetadata != null) {
+            path = pathMetadata;
+        }
     }
 
     @Override
@@ -55,6 +71,16 @@ public class ConsulService implements Service {
     @Override
     public int port() {
         return service.getPort();
+    }
+
+    @Override
+    public String scheme() {
+        return scheme;
+    }
+
+    @Override
+    public String basePath() {
+        return path;
     }
 
     @Override

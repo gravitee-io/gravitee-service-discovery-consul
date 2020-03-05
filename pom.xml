@@ -35,7 +35,7 @@
 
     <properties>
         <gravitee-common.version>1.14.0</gravitee-common.version>
-        <gravitee-service-discovery-api.version>1.1.0</gravitee-service-discovery-api.version>
+        <gravitee-service-discovery-api.version>1.1.1-SNAPSHOT</gravitee-service-discovery-api.version>
     </properties>
 
     <dependencies>
