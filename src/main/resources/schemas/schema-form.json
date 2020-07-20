@@ -22,10 +22,90 @@
       "title": "ACL",
       "description": "ACL token to use in the request. This can also be specified via the CONSUL_HTTP_TOKEN environment variable. If unspecified, the query will default to the token of the Consul agent at the HTTP address.",
       "type" : "string"
+    },
+    "trustStoreType" : {
+      "title": "Truststore Type",
+      "description": "The type of the truststore to use in case of SSL.",
+      "type" : "string",
+      "default": "NONE",
+      "enum" : [ "NONE", "JKS", "PKCS12" ],
+      "x-schema-form": {
+        "type": "select",
+        "titleMap": {
+          "NONE": "None (Trust all)",
+          "JKS": "Java KeyStore (.jks)",
+          "PKCS12": "PKCS#12 (.p12 | .pfx)"
+        }
+      }
+    },
+    "trustStorePassword" : {
+      "title": "Truststore Password",
+      "description": "The type of the truststore to use in case of SSL.",
+      "type" : "string"
+    },
+    "trustStorePath" : {
+      "title": "Truststore path",
+      "description": "The path to the truststore file (at least one of the truststore content and truststore path must be set).",
+      "type" : "string"
+    },
+    "trustStoreContent" : {
+      "title": "Truststore content",
+      "description": "The content of the truststore (at least one of the truststore content and truststore path must be set).",
+      "type" : "string",
+      "x-schema-form": {
+        "type": "codemirror",
+        "codemirrorOptions": {
+          "placeholder": "Place your truststore content here",
+          "lineWrapping": true,
+          "lineNumbers": true,
+          "allowDropFileTypes": true
+        }
+      }
+    },
+    "keyStoreType" : {
+      "title": "KeyStore Type",
+      "description": "The type of the keystore to use in case of SSL.",
+      "type" : "string",
+      "default": "NONE",
+      "enum" : [ "NONE", "JKS", "PKCS12" ],
+      "x-schema-form": {
+        "type": "select",
+        "titleMap": {
+          "NONE": "None (Disabled)",
+          "JKS": "Java KeyStore (.jks)",
+          "PKCS12": "PKCS#12 (.p12 | .pfx)"
+        }
+      }
+    },
+    "keyStorePassword" : {
+      "title": "KeyStore Password",
+      "description": "The type of the keystore to use in case of SSL.",
+      "type" : "string"
+    },
+    "keyStorePath" : {
+      "title": "KeyStore path",
+      "description": "The path to the keystore file (at least one of the keystore content and keystore path must be set).",
+      "type" : "string"
+    },
+    "keyStoreContent" : {
+      "title": "KeyStore content",
+      "description": "The content of the keystore (at least one of the keystore content and keystore path must be set)..",
+      "type" : "string",
+      "x-schema-form": {
+        "type": "codemirror",
+        "codemirrorOptions": {
+          "placeholder": "Place your keystore content here",
+          "lineWrapping": true,
+          "lineNumbers": true,
+          "allowDropFileTypes": true
+        }
+      }
     }
   },
   "required": [
     "url",
-    "service"
+    "service",
+    "trustStoreType",
+    "keyStoreType"
   ]
 }

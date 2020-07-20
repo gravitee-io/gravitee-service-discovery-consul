@@ -31,6 +31,22 @@ public class ConsulServiceDiscoveryConfiguration implements ServiceDiscoveryConf
 
     private String service;
 
+    private TrustStoreType trustStoreType = TrustStoreType.NONE;
+
+    private String trustStorePassword;
+
+    private String trustStorePath;
+
+    private String trustStoreContent;
+
+    private KeyStoreType keyStoreType = KeyStoreType.NONE;
+
+    private String keyStorePassword;
+
+    private String keyStorePath;
+
+    private String keyStoreContent;
+
     public String getUrl() {
         return url;
     }
@@ -61,5 +77,69 @@ public class ConsulServiceDiscoveryConfiguration implements ServiceDiscoveryConf
 
     public void setService(String service) {
         this.service = service;
+    }
+
+    public TrustStoreType getTrustStoreType() {
+        return trustStoreType;
+    }
+
+    public void setTrustStoreType(TrustStoreType trustStoreType) {
+        this.trustStoreType = trustStoreType;
+    }
+
+    public KeyStoreType getKeyStoreType() {
+        return keyStoreType;
+    }
+
+    public void setKeyStoreType(KeyStoreType keyStoreType) {
+        this.keyStoreType = keyStoreType;
+    }
+
+    public String getTrustStorePassword() {
+        return trustStorePassword;
+    }
+
+    public void setTrustStorePassword(String trustStorePassword) {
+        this.trustStorePassword = trustStorePassword;
+    }
+
+    public String getTrustStorePath() {
+        return trustStorePath;
+    }
+
+    public void setTrustStorePath(String trustStorePath) {
+        this.trustStorePath = trustStorePath;
+    }
+
+    public String getTrustStoreContent() {
+        return trustStoreContent;
+    }
+
+    public void setTrustStoreContent(String trustStoreContent) {
+        this.trustStoreContent = trustStoreContent;
+    }
+
+    public String getKeyStorePassword() {
+        return keyStorePassword;
+    }
+
+    public void setKeyStorePassword(String keyStorePassword) {
+        this.keyStorePassword = keyStorePassword;
+    }
+
+    public String getKeyStorePath() {
+        return keyStorePath;
+    }
+
+    public void setKeyStorePath(String keyStorePath) {
+        this.keyStorePath = keyStorePath;
+    }
+
+    public String getKeyStoreContent() {
+        return keyStoreContent;
+    }
+
+    public void setKeyStoreContent(String keyStoreContent) {
+        this.keyStoreContent = keyStoreContent;
     }
 }

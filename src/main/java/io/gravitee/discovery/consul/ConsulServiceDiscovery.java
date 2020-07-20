@@ -20,8 +20,15 @@ import io.gravitee.discovery.api.event.Event;
 import io.gravitee.discovery.api.event.Handler;
 import io.gravitee.discovery.api.service.AbstractServiceDiscovery;
 import io.gravitee.discovery.consul.configuration.ConsulServiceDiscoveryConfiguration;
+import io.gravitee.discovery.consul.configuration.KeyStoreType;
+import io.gravitee.discovery.consul.configuration.TrustStoreType;
 import io.gravitee.discovery.consul.service.ConsulService;
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.net.JksOptions;
+import io.vertx.core.net.PemKeyCertOptions;
+import io.vertx.core.net.PemTrustOptions;
+import io.vertx.core.net.PfxOptions;
 import io.vertx.ext.consul.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +78,63 @@ public class ConsulServiceDiscovery extends AbstractServiceDiscovery<ConsulServi
         if (HTTPS_SCHEME.equalsIgnoreCase(consulUri.getScheme())) {
             // SSL is not configured but the endpoint scheme is HTTPS so let's enable the SSL on Vert.x HTTP client
             // automatically
-            options.setSsl(true).setTrustAll(true);
+            options.setSsl(true);
+
+            // Configure keystore
+            if (configuration.getKeyStoreType() == null || configuration.getKeyStoreType() == KeyStoreType.NONE) {
+                options.setTrustAll(true);
+            } else {
+                if (configuration.getKeyStoreType() == KeyStoreType.JKS) {
+                    JksOptions jksOptions = new JksOptions();
+                    jksOptions.setPassword(configuration.getKeyStorePassword());
+
+                    if (configuration.getKeyStoreContent() != null && configuration.getKeyStoreContent().isEmpty()) {
+                        jksOptions.setValue(Buffer.buffer(configuration.getKeyStoreContent()));
+                    }
+
+                    jksOptions.setPath(configuration.getKeyStorePath());
+
+                    options.setKeyStoreOptions(jksOptions);
+                } else if (configuration.getKeyStoreType() == KeyStoreType.PKCS12) {
+                    PfxOptions pfxOptions = new PfxOptions();
+                    pfxOptions.setPassword(configuration.getKeyStorePassword());
+
+                    if (configuration.getKeyStoreContent() != null && configuration.getKeyStoreContent().isEmpty()) {
+                        pfxOptions.setValue(Buffer.buffer(configuration.getKeyStoreContent()));
+                    }
+
+                    pfxOptions.setPath(configuration.getKeyStorePath());
+
+                    options.setPfxKeyCertOptions(pfxOptions);
+                }
+            }
+
+            // Configure truststore
+            if (configuration.getTrustStoreType() == null || configuration.getTrustStoreType() == TrustStoreType.NONE) {
+                options.setTrustAll(true);
+            } else {
+                if (configuration.getTrustStoreType() == TrustStoreType.JKS) {
+                    JksOptions jksOptions = new JksOptions();
+                    jksOptions.setPassword(configuration.getTrustStorePassword());
+                    jksOptions.setPath(configuration.getTrustStorePath());
+
+                    if (configuration.getTrustStoreContent() != null && configuration.getTrustStoreContent().isEmpty()) {
+                        jksOptions.setValue(Buffer.buffer(configuration.getTrustStoreContent()));
+                    }
+
+                    options.setTrustStoreOptions(jksOptions);
+                } else if (configuration.getTrustStoreType() == TrustStoreType.PKCS12) {
+                    PfxOptions pfxOptions = new PfxOptions();
+                    pfxOptions.setPassword(configuration.getTrustStorePassword());
+                    pfxOptions.setPath(configuration.getTrustStorePath());
+
+                    if (configuration.getTrustStoreContent() != null && !configuration.getTrustStoreContent().isEmpty()) {
+                        pfxOptions.setValue(io.vertx.core.buffer.Buffer.buffer(configuration.getTrustStoreContent()));
+                    }
+
+                    options.setPfxTrustOptions(pfxOptions);
+                }
+            }
         }
 
         LOGGER.info("Consul.io configuration: endpoint[{}] dc[{}] acl[{}]", consulUri.toString(),
