@@ -24,7 +24,7 @@
     <parent>
         <groupId>io.gravitee</groupId>
         <artifactId>gravitee-parent</artifactId>
-        <version>15</version>
+        <version>20.0</version>
     </parent>
 
     <groupId>io.gravitee.discovery</groupId>
@@ -34,9 +34,23 @@
     <name>Gravitee IO - Service Discovery - Consul.io</name>
 
     <properties>
+        <gravitee-bom.version>1.1</gravitee-bom.version>
         <gravitee-common.version>1.18.0</gravitee-common.version>
         <gravitee-service-discovery-api.version>1.1.1</gravitee-service-discovery-api.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Import bom to properly inherit all dependencies -->
+            <dependency>
+                <groupId>io.gravitee</groupId>
+                <artifactId>gravitee-bom</artifactId>
+                <version>${gravitee-bom.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -57,14 +71,12 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-web</artifactId>
-            <version>${vertx.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-consul-client</artifactId>
-            <version>${vertx.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>io.vertx</groupId>
@@ -81,14 +93,12 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
-            <version>${spring.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -106,7 +116,6 @@
             <artifactId>logback-core</artifactId>
         </dependency>
     </dependencies>
-
 
     <build>
         <resources>
