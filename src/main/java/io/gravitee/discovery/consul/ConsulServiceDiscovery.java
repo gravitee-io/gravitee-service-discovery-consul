@@ -26,8 +26,6 @@ import io.gravitee.discovery.consul.service.ConsulService;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.JksOptions;
-import io.vertx.core.net.PemKeyCertOptions;
-import io.vertx.core.net.PemTrustOptions;
 import io.vertx.core.net.PfxOptions;
 import io.vertx.ext.consul.*;
 import org.slf4j.Logger;
