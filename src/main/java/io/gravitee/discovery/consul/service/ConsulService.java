@@ -16,7 +16,6 @@
 package io.gravitee.discovery.consul.service;
 
 import io.gravitee.discovery.api.service.Service;
-
 import java.util.Objects;
 
 /**
@@ -25,10 +24,10 @@ import java.util.Objects;
  */
 public class ConsulService implements Service {
 
-    private final static String CONSUL_ID_PREFIX = "consul:";
+    private static final String CONSUL_ID_PREFIX = "consul:";
 
-    private final static String CONSUL_SSL_METADATA = "gravitee_ssl";
-    private final static String CONSUL_PATH_METADATA = "gravitee_path";
+    private static final String CONSUL_SSL_METADATA = "gravitee_ssl";
+    private static final String CONSUL_PATH_METADATA = "gravitee_path";
 
     private final io.vertx.ext.consul.Service service;
     private final String address;
