@@ -20,7 +20,6 @@ package io.gravitee.discovery.consul.configuration;
  * @author GraviteeSource Team
  */
 public enum KeyStoreType {
-
     NONE,
     PKCS12,
     JKS,

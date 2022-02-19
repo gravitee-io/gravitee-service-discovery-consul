@@ -28,12 +28,11 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.JksOptions;
 import io.vertx.core.net.PfxOptions;
 import io.vertx.ext.consul.*;
+import java.net.URI;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.net.URI;
-import java.util.List;
 
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
@@ -41,7 +40,7 @@ import java.util.List;
  */
 public class ConsulServiceDiscovery extends AbstractServiceDiscovery<ConsulService> implements ServiceDiscovery {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ConsulServiceDiscovery.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConsulServiceDiscovery.class);
 
     private static final String HTTPS_SCHEME = "https";
     private static final int CONSUL_DEFAULT_PORT = 8500;
@@ -68,10 +67,10 @@ public class ConsulServiceDiscovery extends AbstractServiceDiscovery<ConsulServi
         URI consulUri = URI.create(configuration.getUrl());
 
         ConsulClientOptions options = new ConsulClientOptions()
-                .setHost(consulUri.getHost())
-                .setPort((consulUri.getPort() != -1) ? consulUri.getPort() : CONSUL_DEFAULT_PORT)
-                .setDc(configuration.getDc())
-                .setAclToken(configuration.getAcl());
+            .setHost(consulUri.getHost())
+            .setPort((consulUri.getPort() != -1) ? consulUri.getPort() : CONSUL_DEFAULT_PORT)
+            .setDc(configuration.getDc())
+            .setAclToken(configuration.getAcl());
 
         if (HTTPS_SCHEME.equalsIgnoreCase(consulUri.getScheme())) {
             // SSL is not configured but the endpoint scheme is HTTPS so let's enable the SSL on Vert.x HTTP client
@@ -135,59 +134,66 @@ public class ConsulServiceDiscovery extends AbstractServiceDiscovery<ConsulServi
             }
         }
 
-        LOGGER.info("Consul.io configuration: endpoint[{}] dc[{}] acl[{}]", consulUri.toString(),
-                options.getDc(), options.getAclToken());
+        LOGGER.info("Consul.io configuration: endpoint[{}] dc[{}] acl[{}]", consulUri.toString(), options.getDc(), options.getAclToken());
 
         watcher = Watch.service(configuration.getService(), vertx, options);
-        watcher.setHandler(event -> {
-            if (event.succeeded()) {
-                LOGGER.debug("Receiving a Consul.io watch event for service: name[{}]", configuration.getService());
+        watcher
+            .setHandler(event -> {
+                if (event.succeeded()) {
+                    LOGGER.debug("Receiving a Consul.io watch event for service: name[{}]", configuration.getService());
 
-                List<ServiceEntry> entries = event.nextResult().getList();
-                // Handle new services or updated services
-                for (ServiceEntry service : event.nextResult().getList()) {
-                    Service service1 = service.getService();
-                    service1.setNodeAddress(service.getNode().getAddress());
+                    List<ServiceEntry> entries = event.nextResult().getList();
+                    // Handle new services or updated services
+                    for (ServiceEntry service : event.nextResult().getList()) {
+                        Service service1 = service.getService();
+                        service1.setNodeAddress(service.getNode().getAddress());
 
-                    ConsulService consulService = new ConsulService(service1);
+                        ConsulService consulService = new ConsulService(service1);
 
-                    // Get previous service reference
-                    ConsulService oldService = getService(consulService::equals);
+                        // Get previous service reference
+                        ConsulService oldService = getService(consulService::equals);
 
-                    // Endpoint does not exist (according to its name)
-                    if (oldService == null) {
-                        LOGGER.info("Register a new service from Consul.io: id[{}] name[{}]",
-                                service1.getId(), service1.getName());
-                        handler.handle(registerEndpoint(consulService));
-                    } else {
-                        // Update it only if target has been changed
-                        if (consulService.port() != oldService.port() ||
-                                ! consulService.host().equals(oldService.host())) {
-                            LOGGER.info("Update an existing service from Consul.io: id[{}] name[{}] address[{}:{}]",
-                                    service1.getId(), service1.getName(), consulService.host(), consulService.port());
-                            handler.handle(unregisterEndpoint(oldService));
+                        // Endpoint does not exist (according to its name)
+                        if (oldService == null) {
+                            LOGGER.info("Register a new service from Consul.io: id[{}] name[{}]", service1.getId(), service1.getName());
                             handler.handle(registerEndpoint(consulService));
+                        } else {
+                            // Update it only if target has been changed
+                            if (consulService.port() != oldService.port() || !consulService.host().equals(oldService.host())) {
+                                LOGGER.info(
+                                    "Update an existing service from Consul.io: id[{}] name[{}] address[{}:{}]",
+                                    service1.getId(),
+                                    service1.getName(),
+                                    consulService.host(),
+                                    consulService.port()
+                                );
+                                handler.handle(unregisterEndpoint(oldService));
+                                handler.handle(registerEndpoint(consulService));
+                            }
                         }
                     }
-                }
 
-                // Handle de-registered services
-                if (event.prevResult() != null) {
-                    List<ServiceEntry> oldEntries = event.prevResult().getList();
-                    if (oldEntries.size() > entries.size()) {
-                        // Select only de-registered services
-                        oldEntries.removeAll(entries);
-                        for (ServiceEntry oldEntry : oldEntries) {
-                            LOGGER.info("Remove a de-registered service from Consul.io: id[{}] name[{}]",
-                                    oldEntry.getService().getId(), oldEntry.getService().getName());
-                            final ConsulService consulService = new ConsulService(oldEntry.getService());
-                            handler.handle(unregisterEndpoint(consulService));
+                    // Handle de-registered services
+                    if (event.prevResult() != null) {
+                        List<ServiceEntry> oldEntries = event.prevResult().getList();
+                        if (oldEntries.size() > entries.size()) {
+                            // Select only de-registered services
+                            oldEntries.removeAll(entries);
+                            for (ServiceEntry oldEntry : oldEntries) {
+                                LOGGER.info(
+                                    "Remove a de-registered service from Consul.io: id[{}] name[{}]",
+                                    oldEntry.getService().getId(),
+                                    oldEntry.getService().getName()
+                                );
+                                final ConsulService consulService = new ConsulService(oldEntry.getService());
+                                handler.handle(unregisterEndpoint(consulService));
+                            }
                         }
                     }
+                } else {
+                    LOGGER.error("Unexpected error while watching services catalog", event.cause());
                 }
-            } else {
-                LOGGER.error("Unexpected error while watching services catalog", event.cause());
-            }
-        }).start();
+            })
+            .start();
     }
 }
