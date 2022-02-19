@@ -1,0 +1,4 @@
+= Consul service discovery
+
+ifdef::env-github[]
+endif::[]
