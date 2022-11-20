@@ -34,7 +34,7 @@
     <name>Gravitee IO - Service Discovery - Consul.io</name>
 
     <properties>
-        <gravitee-bom.version>1.1</gravitee-bom.version>
+        <gravitee-bom.version>1.5</gravitee-bom.version>
         <gravitee-common.version>1.18.0</gravitee-common.version>
         <gravitee-service-discovery-api.version>1.1.1</gravitee-service-discovery-api.version>
         <!-- Property used by the publication job in CI-->
