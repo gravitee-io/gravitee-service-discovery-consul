@@ -7,3 +7,14 @@ image:https://img.shields.io/badge/semantic--release-conventional%20commits-e100
 image:https://circleci.com/gh/gravitee-io/gravitee-service-discovery-consul.svg?style=svg["CircleCI", link="https://circleci.com/gh/gravitee-io/gravitee-service-discovery-consul"]
 image:https://f.hubspotusercontent40.net/hubfs/7600448/gravitee-github-button.jpg["Join the community forum", link="https://community.gravitee.io?utm_source=readme", height=20]
 endif::[]
+
+== Compatibility matrix
+
+|===
+| Plugin version | APIM            | Java version
+
+| 2.x            | 4.7.x to latest | 21
+| 1.x            | 4.2.x to latest | 11
+|===
+
+The *Java version* column is the bytecode level of the latest release of each line, which sets the minimum runtime able to load the artifact — APIM runs on Java 21 from 4.7 onwards. The top line is not released yet: it is the one this change prepares.
