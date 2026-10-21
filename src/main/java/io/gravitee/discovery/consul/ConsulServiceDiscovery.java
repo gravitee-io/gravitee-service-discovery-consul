@@ -30,6 +30,7 @@ import io.vertx.core.net.PfxOptions;
 import io.vertx.ext.consul.*;
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +72,13 @@ public class ConsulServiceDiscovery extends AbstractServiceDiscovery<ConsulServi
             .setPort((consulUri.getPort() != -1) ? consulUri.getPort() : CONSUL_DEFAULT_PORT)
             .setDc(configuration.getDc())
             .setAclToken(configuration.getAcl());
+
+        // Vert.x 5.0 keeps a non-shared client registered on the close future of the context that created it even after
+        // close(), so the client of every redeployed endpoint group piles up until the node stops. A shared client is
+        // registered through a nested close future that unregisters itself on close; the unique name keeps it from
+        // sharing a pool. Fixed in Vert.x 5.2: drop both settings when upgrading.
+        options.setShared(true);
+        options.setName("service-discovery-consul-" + UUID.randomUUID());
 
         if (HTTPS_SCHEME.equalsIgnoreCase(consulUri.getScheme())) {
             // SSL is not configured but the endpoint scheme is HTTPS so let's enable the SSL on Vert.x HTTP client
