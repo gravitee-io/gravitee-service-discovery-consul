@@ -34,7 +34,7 @@
     <name>Gravitee IO - Service Discovery - Consul.io</name>
 
     <properties>
-        <gravitee-bom.version>1.5</gravitee-bom.version>
+        <gravitee-bom.version>9.0.10</gravitee-bom.version>
         <gravitee-common.version>4.9.2</gravitee-common.version>
         <gravitee-service-discovery-api.version>1.1.1</gravitee-service-discovery-api.version>
         <!-- Property used by the publication job in CI-->
@@ -69,10 +69,10 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Vert.x -->
+        <!-- Vert.x: the gateway provides vertx-core and vertx-web-client, only the Consul client is embedded -->
         <dependency>
             <groupId>io.vertx</groupId>
-            <artifactId>vertx-web</artifactId>
+            <artifactId>vertx-web-client</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -82,11 +82,11 @@
             <exclusions>
                 <exclusion>
                     <groupId>io.vertx</groupId>
-                    <artifactId>vertx-web</artifactId>
+                    <artifactId>vertx-core</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>io.vertx</groupId>
-                    <artifactId>vertx-core</artifactId>
+                    <artifactId>vertx-web-client</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -116,6 +116,28 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
+        </dependency>
+
+        <!-- Tests -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

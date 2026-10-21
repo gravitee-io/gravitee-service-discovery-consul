@@ -91,7 +91,7 @@ public class ConsulServiceDiscovery extends AbstractServiceDiscovery<ConsulServi
 
                     jksOptions.setPath(configuration.getKeyStorePath());
 
-                    options.setKeyStoreOptions(jksOptions);
+                    options.setKeyCertOptions(jksOptions);
                 } else if (configuration.getKeyStoreType() == KeyStoreType.PKCS12) {
                     PfxOptions pfxOptions = new PfxOptions();
                     pfxOptions.setPassword(configuration.getKeyStorePassword());
@@ -102,7 +102,7 @@ public class ConsulServiceDiscovery extends AbstractServiceDiscovery<ConsulServi
 
                     pfxOptions.setPath(configuration.getKeyStorePath());
 
-                    options.setPfxKeyCertOptions(pfxOptions);
+                    options.setKeyCertOptions(pfxOptions);
                 }
             }
 
@@ -119,7 +119,7 @@ public class ConsulServiceDiscovery extends AbstractServiceDiscovery<ConsulServi
                         jksOptions.setValue(Buffer.buffer(configuration.getTrustStoreContent()));
                     }
 
-                    options.setTrustStoreOptions(jksOptions);
+                    options.setTrustOptions(jksOptions);
                 } else if (configuration.getTrustStoreType() == TrustStoreType.PKCS12) {
                     PfxOptions pfxOptions = new PfxOptions();
                     pfxOptions.setPassword(configuration.getTrustStorePassword());
@@ -129,7 +129,7 @@ public class ConsulServiceDiscovery extends AbstractServiceDiscovery<ConsulServi
                         pfxOptions.setValue(io.vertx.core.buffer.Buffer.buffer(configuration.getTrustStoreContent()));
                     }
 
-                    options.setPfxTrustOptions(pfxOptions);
+                    options.setTrustOptions(pfxOptions);
                 }
             }
         }
